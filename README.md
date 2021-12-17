@@ -1,92 +1,72 @@
 # QueryHandler
+a short-handed way to perform CRUD statments, with an Exception handling embeded.
 
-this class's method are static .... that mean you don't need to create an object to use it .
-All methodes will return an Exception if it faild .
+## How to use 
+- basically ,you won't need anything but importing the file as bellow.
+- please note that none of the methods provided is non-static, so make sure to call any method statically. 
 
-<h2 style="background-color:#333;color:#fff">Open - Close the Connection</h2>
-To connect to database use  openConnection($Host , $DBName , $DBUserName , $DBUserPassword) 
-where :
-$Host :is your host (localhost  or your server IP).
-$DBName : is your database name that you want to connect it.
-$DBUserName : is your username that can connect to selected DB.
-$DBUserPassword : is the user 's password .
+```php 
+<?php 
+require 'QueryHandler.php';
 
- Dont't forget to close connection before connection to an other database and don't forget to open connection before calling any query method
- To close Connection use closeConnection() .
- 
-----------------------------------------
+QueryHandler::methodName($params)
+>
+```
 
-<h2 style="background-color:#333;color:#fff">CRUD Methods</h2>
+## methods 
 
-All CRUD Methods could be used fo Any table that you want .
+> it's important that you make a db connection using the connect method listed bellow before any othere query.
 
-<h3 style="background-color:#333;color:#fff">Insert Methods</h3>
+### connect 
+open a connection with database
+```php 
+QueryHandler::connect('[hostname]' ,'[database_Name]' ,'[database_username]' ,'[database_password]')
+```
+### close 
+close a connection with database 
+```php 
+QueryHandler::close()
+```
+### create 
+insert a record in a target table 
+```php 
+QueryHandler::create('tasks' ,[
+    'task_name' => 'example name',
+])
+```
 
-1- insertIntoableByValues($table ,   $ColumnsAndValuesArray) 
-where :
-$table is your table name and $ColumnsAndValuesArray is the Post array (or any associative array) .
-(( don't forget to open connection before calling any query method )) .
+### read 
+select a specific row in a target table 
+```php 
+QueryHandler::read('tasks' ,'[row_id]')
+```
 
-2- insertIntoableByqueryStatment($statment , $valuesArrayForAlias = array()) 
-where :
-$statment is the query that you want to execute it 
-Note : query wil be prepared by prepare PDO method ...... for values use ? and pass the values in $valuesArrayForAlias .
+### readSome
+select a specific row's columns in a target table 
+```php 
+QueryHandler::readSome('tasks' ,$array_of_wanted_fields ,'[row_id]')
+```
 
+### readAll
+select a specific table's rows
+```php 
+QueryHandler::readAll('tasks' ,$array_of_wanted_fields)
+```
 
-<h3 style="background-color:#333;color:#fff">remove  Methods</h3>
+### delete 
+remove a specific row in a target table 
+```php 
+QueryHandler::delete('tasks' ,'[row_id]')
+```
 
-1 - removeItemById($table , $id) 
-where :
-$table is the table name and $id is Item id that you want to remove it .
+### customSQL
+perform a custom SQL query 
+```php 
+QueryHandler::customSQL('[your_custom_query_here]')
+```
 
-2- removeItemByDeleteStatment($statment , $valuesArrayForAlias = array()) 
-where :
-$statment is the query that you want to execute it 
-Note : query wil be prepared by prepare PDO method ...... for values use ? and pass the values in $valuesArrayForAlias .
-
-
-<h3 style="background-color:#333;color:#fff">Find (get Item Informations)  Methodes</h3>
-
-1 - getItemAllInfoById($table , $id)
-where :
-$table is the table name and $id is Item id that you want to get it's information .
-//Note : by this method you can only get one row information ...... to get more than use getItems methods
-
-2 - getItemSomeInfoById($table , $arrayOfColumns, $id)
-where :
-$table is the table name and $id is Item id that you want to get it's information .
-and $arrayOfColumns is a indexed array of columns that you want it's values .
-//Note : by this method you can only get one row's some informations ...... to get more than use getItems methods
-
-3 - getItemInfoBySelectStatement($statment , $valuesArrayForAlias = array())
-where :
-$statment is the query that you want to execute it 
-Note : query wil be prepared by prepare PDO method ...... for values use ? and pass the values in $valuesArrayForAlias .
-//Note : by this method you can only get one row information ...... to get more than use getItems methods
-
-
-4 - getItemsSomeInfo($table , $arrayOfColumns)
-where :
-$table is the table name  , and $arrayOfColumns is a indexed array of columns that you want it's values .
-this method return multi rows in indexed array of objects.
-
-5 - getItemsInfoBySelectStatement($statment , $valuesArrayForAlias = array())
-where :
-$statment is the query that you want to execute it 
-Note : query wil be prepared by prepare PDO method ...... for values use ? and pass the values in $valuesArrayForAlias .
-this method return multi rows in indexed array of objects.
-
-<h3 style="background-color:#333;color:#fff">update  Methods</h3>
-
-1 - updateByqueryStatment($statment , $valuesArrayForAlias = array())
-where :
-$statment is the query that you want to execute it 
-Note : query wil be prepared by prepare PDO method ...... for values use ? and pass the values in $valuesArrayForAlias .
-this method is used to update row or multi row (as you like) by the statment that you write
-
-<h3 style="background-color:#333;color:#fff">is item Unique or found Metohds</h3>
-
-1 - isItemFoundQueryByValuesAndOperators($table , $arrayOfColumnsAndValues , $OperatorsArrayBetweenColumnValues)
+### isItemFoundQueryByValuesAndOperators
+isItemFoundQueryByValuesAndOperators($table , $arrayOfColumnsAndValues , $OperatorsArrayBetweenColumnValues)
 where :
 $table is the table name
 $arrayOfColumnsAndValues is associative array (key is column name , value is column's value)
@@ -95,14 +75,36 @@ $OperatorsArrayBetweenColumnValues is an indexed array of operators that you wan
 that mean : 
 one operator 
 or
+```php 
 (count(OperatorsArrayBetweenColumnValues) == count(arrayOfColumnsAndValues)) must be true  .
-ex : 
-QueryHandler::isItemFoundQueryByValuesAndOperators("users" , array("name" => "Muhammed" , "phoneNumber" => "0999999999") , array("="));
-or
-QueryHandler::isItemFoundQueryByValuesAndOperators("users" , array("name" => "Muhammed" , "phoneNumber" => "0999999999") , array("=" , ">="));
+```
+ex 
+```php 
+QueryHandler::isItemFoundQueryByValuesAndOperators("users" , [
+    "name" => "Muhammed" , 
+    "phoneNumber" => "0999999999"
+    ] , ["="]
+);
+```
 
+or
+```php 
+QueryHandler::isItemFoundQueryByValuesAndOperators("users" , [
+    "name" => "Muhammed" , 
+    "phoneNumber" => "0999999999"
+    ] , 
+    [ "=" ,  ">=" ]
+);
+```
+
+## maintainers
+* [MuhammedALDRUBI](https://github.com/MuhammedALDRUBI)
+* [Adnane](https://github.com/adnane-ka) 
+
+
+## Support 
 Don't Forget to support me on :
-<p dir="rtl" >لا تنسى دعمي على </p>
-<p>Facebook : https://www.facebook.com/MDRDevelopment/</p>
-<p>Instagram : https://www.instagram.com/mdr_development_tr/</p>
+
+* [Facebook](https://www.facebook.com/MDRDevelopment/)
+* [Instagram](https://www.instagram.com/mdr_development_tr/)
 

@@ -2,10 +2,23 @@
 
 class QueryHandler{
 
+    /**
+     * instance of PDO Object representing a connection object
+    */
     static private  $connectionObject = null;
   
-    //this function is used to open the connection with ((Any Database)) , Dont't forget to close connection before connection to an other database
-    static public function openConnection($Host , $DBName , $DBUserName , $DBUserPassword){
+    /**
+     * open a connection with database 
+     * it's important that you close the current connection before connecting to other DB
+     * 
+     * @param $Host (representing the hostname ex localhost)
+     * @param $DBName (database name)
+     * @param $DBUserName (database user name)
+     * @param $DBUserPassword (database user password)
+     * 
+     * @return instance of PDO 
+    */
+    static public function connect($Host , $DBName , $DBUserName , $DBUserPassword){
         try{
             $dns = "mysql:host=" . $Host . ";dbname=" . $DBName .";charset=utf8";
             self::$connectionObject = new PDO($dns , $DBUserName , $DBUserPassword);
@@ -17,20 +30,25 @@ class QueryHandler{
         }
     }
 
-    //this method is used to close the connection
-    static public function closeConnection(){
+    /**
+     * close a connection with database 
+     * 
+     * @return boolean
+    */
+    static public function close(){
         self::$connectionObject = null;
         return true;
     }
- 
-    //==============================================================================
-    //insert Methodes
-    //==============================================================================
 
-    //with this method you can insert values by passing tableName and array of values that you want to send it to DB
-    //Note : don't forget to open connection before use this method
-
-    static public function insertIntoableByValues($table ,   $ColumnsAndValuesArray){
+    /**
+     * insert a record in a target table 
+     * 
+     * @param $table (target table)
+     * @param $ColumnsAndValuesArray (associative array,in which each key-column- is attached to a given value)
+     * 
+     * @return boolean 
+    */
+    static public function create($table , $ColumnsAndValuesArray){
         
         try{
             if(self::$connectionObject == null){
@@ -66,61 +84,15 @@ class QueryHandler{
         }
     }
 
-    //with this method you can insert values by only passing the insert statement that contains table name and columns and values
-    //Note : don't forget to open connection before use this method
-    static public function insertIntoableByqueryStatment($statment , $valuesArrayForAlias = array()){
-        try{
-            if(self::$connectionObject == null){
-                throw new Exception("You must open the connection with database first !");
-            }
-            $insertQuery = self::$connectionObject->prepare($statment);
-            $resultOfInserting = $insertQuery->execute($valuesArrayForAlias);
-            return $resultOfInserting;
-        }
-        catch(Exception $e){
-            return $e->getMessage();
-        }
-    }
-
-    //==============================================================================
-    //remove  Methodes
-    //==============================================================================
-
-    static public function removeItemById($table , $id){
-        try{
-            if(self::$connectionObject == null){
-                throw new Exception("You must open the connection with database first !");
-            }
-            $delete_query_string =  "delete from " . $table . " where Id = ?";
-            $delete_query = self::$connectionObject->prepare($delete_query_string);
-            $resultOfDeleting = $delete_query->execute(array($id));
-            return $resultOfDeleting;
-        }
-        catch(Exception $e){
-            return $e->getMessage();
-        }
-    }
-    
-    static public function removeItemByDeleteStatment($statment , $valuesArrayForAlias = array()){
-        try{
-            if(self::$connectionObject == null){
-                throw new Exception("You must open the connection with database first !");
-            }
-            $delete_query = self::$connectionObject->prepare($statment);
-            $resultOfDeleting = $delete_query->execute($valuesArrayForAlias);
-            return $resultOfDeleting;
-        }
-        catch(Exception $e){
-            return $e->getMessage();
-        }
-    }
-
-    //==============================================================================
-    //Find (get Item Informations)  Methodes
-    //==============================================================================
-    
-    //Note : by this method you can only get one row info ...... to get more than use getItems methods
-    static public function getItemAllInfoById($table , $id){
+    /**
+     * select a specific row in a target table 
+     * 
+     * @param $table (target table)
+     * @param $id (target row's id)
+     * 
+     * @return array 
+    */
+    static public function read($table , $id){
         try{
             if(self::$connectionObject == null){
                 throw new Exception("You must open the connection with database first !");
@@ -136,8 +108,16 @@ class QueryHandler{
         }
     }
 
-    //Note : by this method you can only get one row info ...... to get more than use getItems methods
-    static public function getItemSomeInfoById($table , $arrayOfColumns, $id){
+    /**
+     * select a specific row's columns in a target table 
+     * 
+     * @param string $table (target table)
+     * @param array $arrayOfColumns (indexed array containing wanted columns)
+     * @param int $id (target row's id)
+     * 
+     * @return array 
+    */
+    static public function readSome($table , $arrayOfColumns, $id){
         try{
             if(self::$connectionObject == null){
                 throw new Exception("You must open the connection with database first !");
@@ -163,24 +143,15 @@ class QueryHandler{
         }
     }
 
-    //Note : by this method you can only get one row info ...... to get more than use getItems methods
-    static public function getItemInfoBySelectStatement($statment , $valuesArrayForAlias = array()){
-        try{
-            if(self::$connectionObject == null){
-                throw new Exception("You must open the connection with database first !");
-            }
-            $getInfo_query = self::$connectionObject->prepare($statment);
-            $getInfo_query->execute($valuesArrayForAlias);
-            $row_info = $getInfo_query->fetch();
-            return $row_info;
-        }
-        catch(Exception $e){
-            return $e->getMessage();
-        }
-    }
-
-    //Note : by this method you can only get multiple rows info ..... to get one row info use getItemInfo methods
-    static public function getItemsSomeInfo($table , $arrayOfColumns){
+    /**
+     * select a specific table's rows
+     * 
+     * @param string $table (target table)
+     * @param array $arrayOfColumns (indexed array containing wanted columns)
+     * 
+     * @return array 
+    */
+    static public function readAll($table , $arrayOfColumns){
         try{
             if(self::$connectionObject == null){
                 throw new Exception("You must open the connection with database first !");
@@ -204,48 +175,62 @@ class QueryHandler{
         catch(Exception $e){
             return $e->getMessage();
         }
-    }
+    } 
 
-    //Note : by this method you can only get multiple rows info ..... to get one row info use getItemInfo methods
-    static public function getItemsInfoBySelectStatement($statment , $valuesArrayForAlias = array()){
+    /**
+     * remove a specific row in a target table 
+     * 
+     * @param $table (target table)
+     * @param $id (target row's id)
+     * 
+     * @return boolean 
+    */
+    static public function delete($table , $id){
         try{
             if(self::$connectionObject == null){
                 throw new Exception("You must open the connection with database first !");
             }
-            $getInfo_query = self::$connectionObject->prepare($statment);
-            $getInfo_query->execute($valuesArrayForAlias);
-            $rows_info = $getInfo_query->fetchAll();
-            return $rows_info;
+            $delete_query_string =  "delete from " . $table . " where Id = ?";
+            $delete_query = self::$connectionObject->prepare($delete_query_string);
+            $resultOfDeleting = $delete_query->execute(array($id));
+            return $resultOfDeleting;
         }
         catch(Exception $e){
             return $e->getMessage();
         }
     }
- 
-    //==============================================================================
-    //update Methodes
-    //==============================================================================
-    
-    //with this method you can update values by only passing the update statement that contains table name and columns and values
-    //Note : don't forget to open connection before use this method
-    static public function updateByqueryStatment($statment , $valuesArrayForAlias = array()){
+  
+    /**
+     * perform a custom SQL query 
+     * 
+     * @param string $statment
+     * @param array $valuesArrayForAlias
+    */
+    public static function customSQL($statment ,$valuesArrayForAlias = [])
+    {
         try{
             if(self::$connectionObject == null){
                 throw new Exception("You must open the connection with database first !");
             }
-            $updateQuery = self::$connectionObject->prepare($statment);
-            $resultOfUpdating = $updateQuery->execute($valuesArrayForAlias);
-            return $resultOfUpdating;
+
+            # boolean result will be  returned in insert/update/delete statments
+            $query = self::$connectionObject->prepare($statment); 
+            $result = $query->execute($valuesArrayForAlias);
+
+            # for custom select statments , $result->fetch() & $result->fetchAll can be used directly 
+            return $result;
         }
         catch(Exception $e){
             return $e->getMessage();
         }
+
     }
 
-    //===============================================================================
-    //is item Unique or found Metohds
-    //===============================================================================
-
+    /*
+    ===============================================================================
+    ================================================is item Unique or found Metohds
+    ===============================================================================
+    */
     static public function isItemFoundQueryByValuesAndOperators($table , $arrayOfColumnsAndValues , $OperatorsArrayBetweenColumnValues){
 
         try{
@@ -273,5 +258,4 @@ class QueryHandler{
         }
         
     }
-   
 }
