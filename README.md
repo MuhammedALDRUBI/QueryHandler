@@ -104,5 +104,5 @@ QueryHandler::isItemFoundQueryByValuesAndOperators("users" , array("name" => "Mu
 Don't Forget to support me on :
 <p dir="rtl" >لا تنسى دعمي على </p>
 <p>Facebook : https://www.facebook.com/MDRDevelopment/</p>
-<p>Facebook : https://www.instagram.com/mdr_development_tr/</p>
+<p>Instagram : https://www.instagram.com/mdr_development_tr/</p>
 
