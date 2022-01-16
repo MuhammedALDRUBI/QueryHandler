@@ -1,5 +1,7 @@
 <?php
 
+// QueryHandler 's Class v 1.0
+
 class QueryHandler{
 
     static private  $connectionObject = null;
