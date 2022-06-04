@@ -1,5 +1,10 @@
 # QueryHandler
 
+# Don't use this library ...... instead of it use QuerySystem :
+    https://github.com/MuhammedALDRUBI/QuerySystem
+
+<hr>
+
 this class's method are static .... that mean you don't need to create an object to use it .
 All methodes will return an Exception if it faild .
 
